@@ -17,9 +17,9 @@ public class AnimalController : ControllerBase
     }
 
     [HttpGet]
-    private IActionResult GetAnimal()
+    public IActionResult GetAnimal()
     {
-        SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("(localdb)\\MSSQLLocalDB;Initial Catalog=APBD;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False"));
+        SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("Default"));
         
             connection.Open();
             SqlCommand command = new SqlCommand("SELECT * FROM Animal", connection);
@@ -43,13 +43,25 @@ public class AnimalController : ControllerBase
     }
 
     [HttpPost]
-    private IActionResult EditAnimal()
+    public IActionResult EditAnimal(Animal edited)
     {
+        SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("(localdb)\\MSSQLLocalDB;Initial Catalog=APBD;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False"));
+        SqlCommand command = new SqlCommand("UPDATE Animal SET Name = @Name, Description = @Description, Category = @Category, Area = @Area WHERE IdAnimal = @Id", connection);
+
+        command.Parameters.AddWithValue("@Name", edited.Name);
+        command.Parameters.AddWithValue("@Description", edited.Description ?? (object)DBNull.Value);
+        command.Parameters.AddWithValue("@Category", edited.Category);
+        command.Parameters.AddWithValue("@Area", edited.Area);
+        command.Parameters.AddWithValue("@Id", edited.IdAnimal);
+
+        connection.Open();
+        int rowsAffected = command.ExecuteNonQuery();
+        connection.Close();
         return Ok();
     }
 
     [HttpPut]
-    private IActionResult AddAnimal(Animal animal)
+    public IActionResult AddAnimal(Animal animal)
     {
         SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("Default"));
         
@@ -70,8 +82,15 @@ public class AnimalController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    private IActionResult DeleteAnimal()
+    public IActionResult DeleteAnimal(int id)
     {
+        SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("(localdb)\\MSSQLLocalDB;Initial Catalog=APBD;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False"));
+        SqlCommand command = new SqlCommand("DELETE FROM Animal WHERE IdAnimal = @Id", connection);
+        command.Parameters.AddWithValue("@Id", id);
+
+        connection.Open();
+        int rowsAffected = command.ExecuteNonQuery();
+        connection.Close();
         return Ok();
     }
     

@@ -1,12 +1,27 @@
+﻿using APBD5;
+using Microsoft.AspNetCore.Mvc;
 
-using System.Data.SqlClient;
-using APBD5;
+var builder = WebApplication.CreateBuilder(args);
 
-class MainWeb
+// Add services to the container.
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
+
+
+
+var app = builder.Build();
+
+app.Configuration.GetConnectionString("Default");
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
 {
-    public static void Main(string[] args)
-    {
-        SqlConnection connection = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=apbd;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
-        AnimalController controller = new AnimalController(connection);
-    }
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+app.UseHttpsRedirection();
+
+
+app.Run();
